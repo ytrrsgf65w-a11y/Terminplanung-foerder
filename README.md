@@ -1,49 +1,29 @@
 # Terminplanung für Förderplangespräche
 
-Eine datenschutzbewusste Webanwendung zur Abstimmung von Förderplangesprächen.
+Eine einfache Webanwendung zur vertraulichen Abstimmung von Gesprächsterminen mit Eltern. Eltern können nur die Terminoptionen und das Formular sehen; eingegangene Antworten sind ausschließlich im passwortgeschützten Dashboard abrufbar.
 
-## Funktionen
+## Enthaltene Funktionen
 
-- Terminoptionen anlegen
-- Öffentlichen Formularlink und QR-Code erzeugen
-- Bis zu drei Terminpräferenzen erfassen
-- Eigene Terminvorschläge und Nachrichten erlauben
-- Geschütztes Dashboard mit Kalenderübersicht
-- Antworten nach Datum und Präferenz filtern
-- Individuelle Rückmeldungen löschen
+- Terminserien mit bis zu 60 Datum-/Zeitoptionen erstellen und wieder schließen
+- Eltern-Link und herunterladbaren QR-Code bereitstellen
+- Eltern können bis zu drei unterschiedliche Präferenzen angeben, eine Nachricht senden oder einen Alternativtermin vorschlagen
+- Geschütztes Dashboard mit Kalenderliste sowie Antwortfiltern nach Termin und Präferenz
+- Rückmeldungen einer Terminserie gemeinsam löschen
 
-## Lokale Einrichtung
+## Lokal ausprobieren
 
-1. Node.js 20 oder neuer installieren.
-2. Abhängigkeiten installieren:
-   ```bash
-   npm install
-   ```
-3. Umgebungsdatei anlegen:
-   ```bash
-   cp .env.example .env
-   ```
-4. Datenbank erstellen:
-   ```bash
-   npx prisma migrate dev --name init
-   ```
-5. Anwendung starten:
-   ```bash
-   npm run dev
-   ```
+Voraussetzungen: Node.js 20 oder neuer.
 
-Die Anwendung läuft anschließend unter `http://localhost:3000`.
+1. `npm install`
+2. `.env.example` nach `.env` kopieren und `ADMIN_PASSWORD` durch ein langes, einzigartiges Kennwort ersetzen.
+3. `npx prisma db push`
+4. `npm run dev`
+5. Dashboard unter `http://localhost:3000/dashboard` öffnen. Elternseiten liegen unter `http://localhost:3000/<slug>`.
 
-## Umgebungsvariablen
+Für einen erreichbaren QR-Code muss `NEXT_PUBLIC_APP_URL` auf die öffentliche HTTPS-Adresse der Anwendung gesetzt sein. `DATABASE_URL` ist bei SQLite standardmäßig `file:./dev.db`.
 
-```env
-DATABASE_URL="file:./dev.db"
-ADMIN_TOKEN="ein-langes-zufaelliges-geheimes-passwort"
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
-```
+## Wichtiger Hinweis zum Datenschutz und Betrieb
 
-Das Admin-Kennwort wird nur im Browser für API-Anfragen verwendet und darf nicht an Eltern weitergegeben werden.
+Dies ist ein **MVP/Entwicklungsstand**, keine geprüfte oder bereits betriebene Hosting-Lösung. Es speichert Namen, Präferenzen, Nachrichten und alternative Terminvorschläge. Vor dem Einsatz mit echten Eltern müssen Sie eine geeignete Hosting- und Datenbanklösung wählen, HTTPS, Backups, Zugriffsschutz, Löschfristen und die für Ihre Einrichtung geltenden Datenschutzvorgaben prüfen. SQLite-Dateien sind bei vielen Cloud-Hostern nicht dauerhaft gespeichert; setzen Sie die Anwendung dort nicht ohne persistente Datenbank/Datenträger ein. Veröffentlichen Sie keine echten Rückmeldungen oder Zugangsdaten im Repository.
 
-## Datenschutz
-
-Die Anwendung speichert Namen, Termine, Präferenzen, Nachrichten und alternative Vorschläge in der konfigurierten Datenbank. Es werden keine Antworten zwischen Eltern sichtbar gemacht. Bitte richten Sie auf dem produktiven Server eine Löschroutine nach Ihren Datenschutzrichtlinien ein und verwenden Sie HTTPS.
+Das Kennwort wird ausschließlich als Server-Umgebungsvariable `ADMIN_PASSWORD` konfiguriert; die Login-Sitzung wird in einem HttpOnly-, SameSite-Cookie gehalten. Legen Sie die Variable nicht in den Quellcode oder in öffentliche Dateien. Für eine Live-Anwendung sind zusätzlich unter anderem Rate-Limiting, geregelte Backups/Löschung und eine Datenschutzprüfung erforderlich.
